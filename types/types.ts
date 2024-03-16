@@ -57,6 +57,7 @@ export interface IWorld {
   isActive?: boolean;
   yPosition?: number;
   setDialogState?: any;
+  token: Token;
 }
 
 export enum Token {
