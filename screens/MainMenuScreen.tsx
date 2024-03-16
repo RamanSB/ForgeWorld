@@ -93,7 +93,7 @@ const MainMenuScreen: React.FC<MainMenuScreenProps> = ({ navigation }) => {
         break;
       case MAIN_MENU_OPTIONS[3]:
         console.log(`Navigating to the leaderboard...`);
-        // navigation.navigate("Leaderboard");
+        navigation.navigate("Leaderboard");
         break;
       default:
         console.log(`Error: Navigating to the unknown: ${selectedOption}`);
@@ -234,7 +234,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     paddingHorizontal: 20,
     paddingVertical: 10,
-
     borderRadius: 5,
   },
   trademark: {

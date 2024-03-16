@@ -8,6 +8,7 @@ export type RootStackParamList = {
   Game: undefined;
   Profile: undefined;
   CharacterSelect: undefined;
+  Leaderboard: undefined;
 };
 
 // Entity Types

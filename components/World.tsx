@@ -117,6 +117,7 @@ const worldStyles = StyleSheet.create({
   },
   bottomRow: {
     justifyContent: "space-between",
+    alignItems: "center",
   },
   button: {
     minWidth: 100,

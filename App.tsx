@@ -9,6 +9,7 @@ import { GameContextProvider } from "./contexts/GameContext";
 import MainMenuScreen from "./screens/MainMenuScreen";
 import CharacterSelectScreen from "./screens/CharacterSelectScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import LeaderboardScreen from "./screens/LeaderboardScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -26,6 +27,7 @@ export default function App() {
             component={CharacterSelectScreen}
           />
           <Stack.Screen name={"Game"} component={GameScreen} />
+          <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GameContextProvider>

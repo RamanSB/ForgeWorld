@@ -11,10 +11,10 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Button,
   ScrollView,
   TextInput,
 } from "react-native";
+import { Button } from "@rneui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ICharacter, RootStackParamList } from "../types/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -78,12 +78,6 @@ const CharacterSelectScreen: React.FC<CharacterSelectScreenProps> = ({
     ToysRUs: require("../assets/fonts/toys_r_us.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
   const characters: ICharacter[] = [
     { name: "Doge Da Dog", imgSrc: DOGE_DOG_IMAGE_URL },
     { name: "Bober", imgSrc: BO_BEAR_IMAGE_URL },
@@ -138,9 +132,14 @@ const CharacterSelectScreen: React.FC<CharacterSelectScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.charactersContainer}>
-        <Text style={[styles.selectCharacterText, { fontFamily: "ToysRUs" }]}>
+        <Text
+          style={[
+            { fontFamily: "ToysRUs", marginTop: 20 },
+            styles.selectCharacterText,
+          ]}
+        >
           Enter Your Name
         </Text>
         <TextInput
@@ -149,7 +148,12 @@ const CharacterSelectScreen: React.FC<CharacterSelectScreenProps> = ({
           value={userName}
           onChangeText={setUserName}
         />
-        <Text style={[styles.selectCharacterText, { fontFamily: "ToysRUs" }]}>
+        <Text
+          style={[
+            styles.selectCharacterText,
+            { fontFamily: "ToysRUs", marginTop: 10 },
+          ]}
+        >
           Select Character
         </Text>
         {characters.map((character: ICharacter, index) => (
@@ -172,23 +176,40 @@ const CharacterSelectScreen: React.FC<CharacterSelectScreenProps> = ({
             </Text>
           </TouchableOpacity>
         ))}
+        {selectedCharacter && userName.trim() && (
+          <View style={styles.confirmButtonContainer}>
+            <Button
+              title="Confirm"
+              onPress={handleConfirmSelection}
+              type="clear"
+              titleStyle={{
+                fontFamily: "ToysRUs",
+                fontSize: 20,
+                color: "gold",
+              }}
+              buttonStyle={{ width: "100%" }}
+            />
+          </View>
+        )}
       </ScrollView>
-      {selectedCharacter && userName.trim() && (
-        <View style={styles.confirmButtonContainer}>
-          <Button title="Confirm" onPress={handleConfirmSelection} />
-        </View>
-      )}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  confirmButtonContainer: { marginBottom: 80 },
+  confirmButtonContainer: {
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    marginTop: 4,
+    borderRadius: 5,
+  },
   selectCharacterText: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 20,
+
+    marginBottom: 10,
   },
   charactersContainer: {
     alignItems: "center",
