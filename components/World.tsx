@@ -1,19 +1,18 @@
 import { AntDesign } from "@expo/vector-icons";
 import { Button } from "@rneui/themed";
-import React, { useCallback, useContext } from "react";
+import { useFonts } from "expo-font";
+import React, { useContext } from "react";
 import {
   ImageBackground,
-  LayoutChangeEvent,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { IWorld } from "../types/types";
 import { GameContext } from "../contexts/GameContext";
+import { IWorld } from "../types/types";
 import Avatar from "./Avatar";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
+import { worlds } from "../shared";
 
 const images = {
   Volcano: require("../assets/volcanic-terrain.png"),
@@ -28,7 +27,8 @@ const World = ({
   terrain,
   additionalStyle,
   isActive,
-  onLayout,
+  setDialogState,
+  token,
 }: IWorld) => {
   const { setSelectedWorld, setIsBottomSheetVisible } = useContext(GameContext);
   const img = images[terrain];
@@ -43,11 +43,7 @@ const World = ({
   }
 
   return (
-    <ImageBackground
-      style={[worldStyles.bg, additionalStyle]}
-      source={img}
-      onLayout={onLayout}
-    >
+    <ImageBackground style={[worldStyles.bg, additionalStyle]} source={img}>
       <View style={worldStyles.topRow}>
         <View style={worldStyles.activePlayersBg}>
           <Text
@@ -69,6 +65,7 @@ const World = ({
               terrain,
               additionalStyle,
               title,
+              token,
             });
             setIsBottomSheetVisible(true);
           }}
@@ -86,7 +83,11 @@ const World = ({
         <Button
           title={title}
           onPress={() => {
-            console.log(`Pressed: ${title}`);
+            console.log(`Pressed: ${terrain}`);
+            setDialogState({
+              world: worlds.find((world) => world.terrain === terrain),
+              isVisible: true,
+            });
           }}
           buttonStyle={[worldStyles.button, { backgroundColor: color }]}
           titleStyle={[worldStyles.buttonTitle, { fontFamily: "ToysRUs" }]}

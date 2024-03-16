@@ -56,7 +56,7 @@ export interface IWorld {
   additionalStyle?: any;
   isActive?: boolean;
   yPosition?: number;
-  onLayout?: any;
+  setDialogState?: any;
 }
 
 export enum Token {

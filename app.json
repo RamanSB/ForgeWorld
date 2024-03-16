@@ -11,11 +11,10 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ramansb.frontend"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,17 +30,7 @@
       [
         "expo-font",
         {
-          "fonts": [
-            "./assets/toys_r_us.ttf"
-          ]
-        }
-      ],
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 34
-          }
+          "fonts": ["./assets/toys_r_us.ttf"]
         }
       ]
     ],

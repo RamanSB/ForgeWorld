@@ -1,12 +1,13 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useContext, useLayoutEffect, useState } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import World from "../components/World";
 import { IGame, IWorld, RootStackParamList, Token } from "../types/types";
-import { BottomSheet } from "@rneui/themed";
+import { BottomSheet, Dialog } from "@rneui/themed";
 import { useFonts } from "expo-font";
 import { GameContext } from "../contexts/GameContext";
+import { worlds } from "../shared";
 
 type CharacterEntity = {
   position: {
@@ -27,28 +28,6 @@ const window = Dimensions.get("window");
 
 const PEPE_IMAGE: string =
   "https://www.freefavicon.com/freefavicons/objects/pepe-152-270481.png";
-
-export const worlds: IWorld[] = [
-  {
-    terrain: "Volcano",
-    title: "Mine Gems 💎",
-    color: "red",
-    metadata: { activePlayers: 3, token: Token.RUBY },
-  },
-  {
-    terrain: "Forest",
-    title: "Harvest Wood 🪵",
-    color: "green",
-    metadata: { activePlayers: 3, token: Token.LUMBER },
-  },
-  ,
-  {
-    terrain: "Ocean",
-    title: "Fish for Pearls 🫧",
-    color: "cornflowerblue",
-    metadata: { activePlayers: 3, token: Token.PEARL },
-  },
-];
 
 const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
   const { activeWorld } = useContext(GameContext);
@@ -82,7 +61,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <Game worlds={worlds} />
-      <>{/* <WorldDetailBottomSheet /> */}</>
     </View>
   );
 };
@@ -92,25 +70,13 @@ const Game = ({ worlds, character }: IGame) => {
   const NOTCH_HEIGHT = insets.top; // Notch height (iPhone island) - perhaps other phones have this...
   console.log(`Notch Height: ${NOTCH_HEIGHT}`);
 
-  const { activeWorld } = useContext(GameContext);
+  const { activeWorld, setActiveWorld } = useContext(GameContext);
+  const [dialogState, setDialogState] = useState({
+    world: activeWorld,
+    visible: false,
+  });
 
-  const [worldLayouts, setWorldLayouts] = useState({});
-
-  const handleWorldLayout = (idx, event) => {
-    const { y, height } = event.nativeEvent.layout;
-    const bottomY = y + height; // Calculate the bottom Y position
-
-    console.log(`World (${idx}): ${bottomY}`);
-
-    setWorldLayouts((prevLayouts) => ({
-      ...prevLayouts,
-      [idx]: {
-        ...prevLayouts[idx],
-        y: y, // Top-left Y
-        bottomY: bottomY, // Bottom-left Y
-      },
-    }));
-  };
+  console.log(`Dialog State: ${JSON.stringify(dialogState)}`);
 
   return (
     <View style={gameStyles.container}>
@@ -124,12 +90,44 @@ const Game = ({ worlds, character }: IGame) => {
             metadata={world.metadata}
             key={idx}
             isActive={activeWorld.terrain === world.terrain}
-            onLayout={(event) => handleWorldLayout(idx, event)}
+            setDialogState={setDialogState}
+            token={world.token}
           />
           <Divider />
         </View>
       ))}
-      <>{/* <WorldDetailBottomSheet /> */}</>
+      <Dialog
+        isVisible={dialogState.visible}
+        onBackdropPress={() =>
+          setDialogState((prevState) => ({ ...prevState, visible: false }))
+        }
+        overlayStyle={{ backgroundColor: "white" }}
+      >
+        <Dialog.Title
+          title={`Are you sure you want to enter the ${dialogState.world.terrain}`}
+        />
+
+        <Text>
+          You will {dialogState.world.title} and earn {dialogState.world.token}.
+        </Text>
+
+        <Dialog.Actions>
+          <Dialog.Button
+            title="Confirm"
+            onPress={() => {
+              // TODO: Api Call use loading states.
+              setActiveWorld(dialogState.world);
+              setDialogState((prevState) => ({ ...prevState, visible: false }));
+            }}
+          />
+          <Dialog.Button
+            title="Cancel"
+            onPress={() =>
+              setDialogState((prevState) => ({ ...prevState, visible: false }))
+            }
+          />
+        </Dialog.Actions>
+      </Dialog>
     </View>
   );
 };

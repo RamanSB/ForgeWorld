@@ -21,7 +21,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { GameContext } from "../contexts/GameContext";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { worlds } from "./GameScreen";
+import { worlds } from "../shared";
 
 export type CharacterSelectScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "CharacterSelect">;
