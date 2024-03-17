@@ -1,27 +1,20 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Button } from "@rneui/themed";
+import { useFonts } from "expo-font";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
+  Image,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ScrollView,
   TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Button } from "@rneui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ICharacter, RootStackParamList } from "../types/types";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { GameContext } from "../contexts/GameContext";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import { worlds } from "../shared";
+import { characters, worlds } from "../shared";
+import { ICharacter, RootStackParamList } from "../types/types";
 
 export type CharacterSelectScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "CharacterSelect">;
@@ -64,6 +57,12 @@ export const BO_BEAR_IMAGE_URL =
 export const DOGE_DOG_IMAGE_URL =
   "https://i.seadn.io/gae/AU-ip8HlUWOfUYwxbgnbJUcRtSauohPG6Wc7yB2HTXvW76CzclL03E52lOG4ehpPY7Skflhw5sfJecLsh4fInrkhe4MomoseJ2JUQg?auto=format&dpr=1&w=1000";
 
+export const NOUNS_64_IMAGE_URL = ``;
+export const NOUNS_69_IMAGE_URL = ``;
+export const NOUNS_214_IMAGE_URL = ``;
+export const NOUNS_233_IMAGE_URL = ``;
+export const NOUNS_247_IMAGE_URL = `https://openseauserdata.com/files/236732aa6f86fde15afcd952af565f4d.svg`;
+
 const CharacterSelectScreen: React.FC<CharacterSelectScreenProps> = ({
   navigation,
 }) => {
@@ -77,18 +76,6 @@ const CharacterSelectScreen: React.FC<CharacterSelectScreenProps> = ({
   const [fontsLoaded] = useFonts({
     ToysRUs: require("../assets/fonts/toys_r_us.ttf"),
   });
-
-  const characters: ICharacter[] = [
-    { name: "Doge Da Dog", imgSrc: DOGE_DOG_IMAGE_URL },
-    { name: "Bober", imgSrc: BO_BEAR_IMAGE_URL },
-    { name: "Pepe", imgSrc: PEPE_IMAGE_URL },
-    { name: "PepePig", imgSrc: PEPE_PIG_IMAGE_URL },
-    { name: "Twinky Winky", imgSrc: TWINKY_WINKY_IMAGE_URL },
-    {
-      name: "Cryp-Po",
-      imgSrc: CRYPPO_IMAGE_URL,
-    },
-  ];
 
   /** Set the active world by default here for the user, can move this if necessary to a better location */
   useEffect(() => {

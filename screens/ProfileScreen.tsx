@@ -1,11 +1,20 @@
-import React, { useCallback, useContext, useLayoutEffect } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
+import { StyleSheet, Text, View, Image, FlatList } from "react-native";
 import { GameContext } from "../contexts/GameContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/types";
+import { RootStackParamList, Token } from "../types/types";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Button, LinearProgress } from "@rneui/themed";
+import { CheckBox, Dialog, Divider } from "@rneui/base";
 
 export type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Profile">;
@@ -14,6 +23,26 @@ export type ProfileScreenProps = {
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const { player } = useContext(GameContext); // Assuming your context provides the player object with a level and username
   console.log(`[ProfileScreen]: ${JSON.stringify(player)}`);
+  const [isClaimableDialogVisible, setIsClaimableDialogVisible] =
+    useState(false);
+  const [isLevelUpDialogVisible, setIsLevelUpDialogVisible]: [
+    boolean,
+    Dispatch<SetStateAction<boolean>>
+  ] = useState(false);
+  const [requestingTransaction, setRequestTransaction]: [
+    boolean,
+    Dispatch<SetStateAction<boolean>>
+  ] = useState(false);
+
+  // checkedAttribuet
+  const [checkedAttribute, setCheckedAttribute] = useState(1);
+  const ATTRIBUTES_LIST: string[] = [
+    "Strength",
+    "Intellect",
+    "Agility",
+    "Stamina",
+  ];
+
   const [fontsLoaded] = useFonts({
     ToysRUs: require("../assets/fonts/toys_r_us.ttf"),
   });
@@ -21,6 +50,38 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   if (!fontsLoaded) {
     return null;
   }
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchResources = async () => {
+      // Make fetch  call to blockchain [existing player resources] (if data is not undefined and isMounted) - setResources.
+      if (isMounted) {
+      }
+    };
+
+    const fetchClaimableResources = async () => {
+      // Make fetch call to blockchain [claimable Resources](if data is not undefined and isMounted) - setClaimableResources.
+      if (isMounted) {
+      }
+    };
+    // await fetchResources();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // NOTE: PRI use setResources to update the resources when you make your call to the BlOCKACHAIN
+  const [resources, setResources] = useState({
+    rubies: 100,
+    lumber: 100,
+    pearls: 100,
+  });
+
+  const [claimableResources, setClaimableResources] = useState({
+    rubies: 12,
+    lumber: 3,
+    pearls: 8,
+  });
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -44,152 +105,319 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const { attributes } = player;
   const currentLevel = Object.values(attributes).reduce((a, b) => a + b);
+
+  const ActionButtons = ({
+    setIsClaimableDialogVisible,
+    setIsLevelUpDialogVisible,
+  }) => {
+    return (
+      <View style={styles.container}>
+        <View style={styles.buttonContainer}>
+          <Button
+            titleStyle={styles.titleStyle}
+            buttonStyle={styles.buttonStyle}
+            onPress={() => setIsClaimableDialogVisible(true)}
+            title="Claim"
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button
+            titleStyle={styles.titleStyle}
+            buttonStyle={styles.buttonStyle}
+            onPress={() => setIsLevelUpDialogVisible(true)}
+            title="Level Up"
+          />
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.cardContainer} onLayout={onLayoutRootView}>
       <View style={styles.cardHeader}>
         <Text style={[styles.cardTitle, { fontFamily: "ToysRUs" }]}>
           {player.username}
         </Text>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={[styles.cardLevel, { fontFamily: "ToysRUs" }]}>
-            Level {currentLevel}
-          </Text>
-          <LinearProgress
-            style={{
-              marginVertical: 10,
-              width: 75,
-              height: 8,
-              borderRadius: 8,
-              marginHorizontal: 4,
-            }}
-            value={Math.random()}
-            variant="determinate"
-            trackColor="red"
-            color="green"
+        <Text style={[styles.cardTitle, { fontFamily: "ToysRUs" }]}>
+          {player.name}
+        </Text>
+      </View>
+      <View style={{ width: "100%", alignItems: "center" }}>
+        <View style={styles.imageContainer}>
+          <Image
+            style={styles.cardImage}
+            source={{ uri: player.imgSrc }} // The player's image URL goes here
           />
-          <Text style={[styles.cardLevel, { fontFamily: "ToysRUs" }]}>
-            {" "}
-            {currentLevel + 1}
-          </Text>
         </View>
+        <LevelSection currentLevel={currentLevel} />
       </View>
-      <View style={styles.imageContainer}>
-        <Image
-          style={styles.cardImage}
-          source={{ uri: player.imgSrc }} // The player's image URL goes here
-        />
-      </View>
-      <View style={styles.attributesContainer}>
-        <View style={[styles.column1]}>
-          <Text style={[styles.resourcesHeader, { fontFamily: "ToysRUs" }]}>
-            Attributes
-          </Text>
-          <Text style={[styles.attributeName, { fontFamily: "ToysRUs" }]}>
-            Strength
-          </Text>
-          <Text style={[styles.attributeValue, { fontFamily: "ToysRUs" }]}>
-            {attributes.strength}
-          </Text>
-          <Text style={[styles.attributeName, { fontFamily: "ToysRUs" }]}>
-            Intellect
-          </Text>
-          <Text style={[styles.attributeValue, { fontFamily: "ToysRUs" }]}>
-            {attributes.intellect}
-          </Text>
-          <Text style={[styles.attributeName, { fontFamily: "ToysRUs" }]}>
-            Agility
-          </Text>
-          <Text style={[styles.attributeValue, { fontFamily: "ToysRUs" }]}>
-            {attributes.agility}
-          </Text>
-          <Text style={[styles.attributeName, { fontFamily: "ToysRUs" }]}>
-            Stamina
-          </Text>
-          <Text style={[styles.attributeValue, { fontFamily: "ToysRUs" }]}>
-            {attributes.stamina}
-          </Text>
-        </View>
 
-        <View style={styles.resourcesContainer}>
-          <Text style={[styles.resourcesHeader, { fontFamily: "ToysRUs" }]}>
-            Resources
+      <AttributeSection
+        agility={attributes.agility}
+        intellect={attributes.intellect}
+        strength={attributes.strength}
+        stamina={attributes.stamina}
+      />
+      <Divider
+        style={{ height: 4, borderWidth: 4, marginVertical: 16 }}
+        orientation="vertical"
+      />
+      <ResourceSection
+        lumber={resources.lumber}
+        pearls={resources.pearls}
+        ruby={resources.rubies}
+      />
+      <ActionButtons
+        setIsClaimableDialogVisible={setIsClaimableDialogVisible}
+        setIsLevelUpDialogVisible={setIsLevelUpDialogVisible}
+      />
+      {isClaimableDialogVisible && (
+        <Dialog
+          isVisible={isClaimableDialogVisible}
+          overlayStyle={{ backgroundColor: "white" }}
+          onBackdropPress={() => {
+            setIsClaimableDialogVisible(false);
+          }}
+        >
+          <Dialog.Title
+            title={`Claim Tokens`}
+            titleStyle={{ fontFamily: "ToysRUs" }}
+          />
+
+          <Text>
+            {Object.entries(claimableResources).map(([key, value], idx) => {
+              console.log(key);
+              console.log(value);
+
+              return (
+                <Text key={key} style={{ fontFamily: "ToysRUs", fontSize: 18 }}>
+                  {"\n"}
+                  {key}: {value}
+                </Text>
+              );
+            })}
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-around",
-            }}
-          >
-            <View style={styles.column2}>
-              <Text style={[styles.subHeader, { fontFamily: "ToysRUs" }]}>
-                Earned
-              </Text>
 
-              <Text style={[styles.resourceName, { fontFamily: "ToysRUs" }]}>
-                💎 Rubies
-              </Text>
-              <Text style={[styles.resourceValue, { fontFamily: "ToysRUs" }]}>
-                {/* player.rubies */}135
-              </Text>
-
-              <Text style={[styles.resourceName, { fontFamily: "ToysRUs" }]}>
-                🫧 Pearls
-              </Text>
-              <Text style={[styles.resourceValue, { fontFamily: "ToysRUs" }]}>
-                {/* player.pearls */}51
-              </Text>
-              <Text style={[styles.resourceName, { fontFamily: "ToysRUs" }]}>
-                🪵 Lumber
-              </Text>
-              <Text style={[styles.resourceValue, { fontFamily: "ToysRUs" }]}>
-                {/* player.lumber */}12
-              </Text>
-            </View>
-
-            <View style={styles.column3}>
-              <Text style={[styles.subHeader, { fontFamily: "ToysRUs" }]}>
-                Claimable
-              </Text>
-              <Text style={[styles.resourceName, { fontFamily: "ToysRUs" }]}>
-                💎 Rubies
-              </Text>
-              <Text style={[styles.resourceValue, { fontFamily: "ToysRUs" }]}>
-                {/* player.claimableRubies */}12
-              </Text>
-              <Text style={[styles.resourceName, { fontFamily: "ToysRUs" }]}>
-                🫧 Pearls
-              </Text>
-              <Text style={[styles.resourceValue, { fontFamily: "ToysRUs" }]}>
-                {/* player.claimablePearls */}53
-              </Text>
-              <Text style={[styles.resourceName, { fontFamily: "ToysRUs" }]}>
-                🪵 Lumber
-              </Text>
-              <Text style={[styles.resourceValue, { fontFamily: "ToysRUs" }]}>
-                {/* player.claimableLumber */}125
-              </Text>
-            </View>
-          </View>
-          <View style={{ paddingHorizontal: "5%", marginTop: 6 }}>
-            <Button
-              title="Claim"
-              type="outline"
-              titleStyle={{ fontFamily: "ToysRUs", color: "gold" }}
-              buttonStyle={{
-                width: "100%",
-                backgroundColor: "black",
-                borderRadius: 4,
-              }}
+          <Dialog.Actions>
+            <Dialog.Button
+              title="Confirm"
               onPress={() => {
-                /* TODO: Api Call to claim resources. */
+                // TODO: Api Call use loading states.
+                setRequestTransaction(true);
               }}
-            ></Button>
-          </View>
-        </View>
+            />
+            <Dialog.Button
+              title="Cancel"
+              onPress={() => setIsClaimableDialogVisible(false)}
+            />
+          </Dialog.Actions>
+        </Dialog>
+      )}
+      {isLevelUpDialogVisible && (
+        <Dialog
+          isVisible={isLevelUpDialogVisible}
+          overlayStyle={{ backgroundColor: "white" }}
+          onBackdropPress={() => {
+            setIsLevelUpDialogVisible(false);
+          }}
+        >
+          {!requestingTransaction ? (
+            <>
+              <Text style={{ fontFamily: "ToysRUs", fontSize: 18 }}>
+                Level Up Your Skill
+              </Text>
+              {/* Should be using enums but its a hackathon so fuck it*/}
+              {ATTRIBUTES_LIST.map((l, i) => (
+                <CheckBox
+                  key={i}
+                  title={l}
+                  containerStyle={{ backgroundColor: "white", borderWidth: 0 }}
+                  checkedIcon="dot-circle-o"
+                  uncheckedIcon="circle-o"
+                  checked={checkedAttribute === i}
+                  onPress={() => setCheckedAttribute(i)}
+                />
+              ))}
+
+              <Text style={{ fontFamily: "ToysRUs" }}>
+                {_determineSkillPaymentAmount(
+                  ATTRIBUTES_LIST[checkedAttribute] as
+                    | "Agility"
+                    | "Stamina"
+                    | "Strength"
+                    | "Intellect"
+                )}
+              </Text>
+
+              <Dialog.Actions>
+                <Dialog.Button
+                  title="Confirm"
+                  onPress={() => {
+                    // TODO: Api Call use loading states.
+                    setRequestTransaction(true);
+                  }}
+                />
+                <Dialog.Button
+                  title="Cancel"
+                  onPress={() => setIsLevelUpDialogVisible(false)}
+                />
+              </Dialog.Actions>
+            </>
+          ) : (
+            <Dialog.Loading />
+          )}
+        </Dialog>
+      )}
+    </View>
+  );
+};
+
+// some bullshit helper functino to calculate fake values
+const _determineSkillPaymentAmount = (
+  skill: "Agility" | "Stamina" | "Strength" | "Intellect"
+) => {
+  let requiredAmount = "Required Amount: \n";
+  switch (skill) {
+    case "Agility":
+      requiredAmount += "5 Rubies\n10 Lumber\n8 Pearlss";
+      return requiredAmount;
+    case "Stamina":
+      requiredAmount += "5 Rubies\n19 Lumber\n8 Pearlss";
+      return requiredAmount;
+    case "Strength":
+      requiredAmount += "2 Rubies\n1 Lumber\n8 Pearlss";
+      return requiredAmount;
+    case "Intellect":
+      requiredAmount += "56 Rubies\n10 Lumber\n8 Pearlss";
+      return requiredAmount;
+    default:
+      console.error(`unknwon skill bruh wtf... ${skill}`);
+  }
+};
+
+const LevelSection = ({ currentLevel }: { currentLevel: number }) => {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 4,
+        width: "100%",
+      }}
+    >
+      <Text style={[styles.cardLevel, { fontFamily: "ToysRUs" }]}>
+        Level {currentLevel}
+      </Text>
+      <LinearProgress
+        style={{
+          flex: 1,
+          marginVertical: 10,
+          width: 70,
+          height: 8,
+          borderRadius: 8,
+          marginHorizontal: 4,
+        }}
+        value={Math.random()}
+        variant="determinate"
+        trackColor="red"
+        color="green"
+      />
+      <Text style={[styles.cardLevel, { fontFamily: "ToysRUs" }]}>
+        {" "}
+        {currentLevel + 1}
+      </Text>
+    </View>
+  );
+};
+
+const AttributeSection = ({
+  strength,
+  intellect,
+  agility,
+  stamina,
+}: {
+  strength: number;
+  intellect: number;
+  agility: number;
+  stamina: number;
+}) => {
+  return (
+    <View style={{ width: "100%" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 20,
+        }}
+      >
+        <Text style={{ fontSize: 18, fontFamily: "ToysRUs" }}>
+          💪 Strength: {strength}
+        </Text>
+        <Text style={{ fontSize: 18, fontFamily: "ToysRUs" }}>
+          🏃‍♂️ Stamina: {stamina}
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 20,
+        }}
+      >
+        <Text style={{ fontSize: 18, fontFamily: "ToysRUs" }}>
+          🤸‍♂️ Agility: {agility}
+        </Text>
+        <Text style={{ fontSize: 18, fontFamily: "ToysRUs" }}>
+          🧠 Intellect: {intellect}
+        </Text>
       </View>
     </View>
   );
 };
+
+const ResourceSection = ({ ruby, pearls, lumber }) => {
+  const ResourceItem = ({
+    token,
+    amount,
+  }: {
+    token: Token;
+    amount: number;
+  }) => {
+    const iconMap = new Map([
+      [Token.RUBY, "💎"],
+      [Token.LUMBER, "🪵"],
+      [Token.PEARL, "🫧"],
+    ]);
+
+    return (
+      <View style={{ alignItems: "center" }}>
+        <Text style={{ fontFamily: "ToysRUs", fontSize: 20 }}>{token}</Text>
+        <Text style={{ fontFamily: "ToysRUs", fontSize: 20, marginTop: 16 }}>
+          {iconMap.get(token)} {amount}
+        </Text>
+      </View>
+    );
+  };
+
+  return (
+    <View style={{ width: "100%" }}>
+      <View
+        style={{
+          padding: 16,
+          justifyContent: "space-evenly",
+          alignItems: "center",
+          flexDirection: "row",
+        }}
+      >
+        <ResourceItem token={Token.RUBY} amount={ruby} />
+        <ResourceItem token={Token.LUMBER} amount={lumber} />
+        <ResourceItem token={Token.PEARL} amount={pearls} />
+      </View>
+    </View>
+  );
+};
+
+// NOTE FOR PRI: When you click these buttons (define a state above in the ProfileScreen and pass it as a prop to the ResourceSection component to update the displayed )
 
 export default ProfileScreen;
 
@@ -287,12 +515,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     borderWidth: 2,
   },
-  column2: {
-    alignItems: "flex-start",
-    marginTop: 4,
+
+  container: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  column3: {
-    alignItems: "flex-start",
-    marginTop: 4,
+  buttonContainer: {
+    flex: 1, // This ensures that the button's container takes up equal space
+    paddingHorizontal: 5, // Optional: Adds some spacing between the buttons
+  },
+  buttonStyle: {
+    backgroundColor: "black",
+    borderRadius: 4,
+  },
+  titleStyle: {
+    fontFamily: "ToysRUs",
+    color: "gold",
   },
 });
